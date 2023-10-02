@@ -4,15 +4,16 @@
 
 import 'package:flutter/material.dart';
 
-class ImplicitAnimationsScreen extends StatefulWidget {
-  const ImplicitAnimationsScreen({super.key});
+class ImplicitAnimationsExScreen extends StatefulWidget {
+  const ImplicitAnimationsExScreen({super.key});
 
   @override
-  State<ImplicitAnimationsScreen> createState() =>
-      _ImplicitAnimationsScreenState();
+  State<ImplicitAnimationsExScreen> createState() =>
+      _ImplicitAnimationsExScreenState();
 }
 
-class _ImplicitAnimationsScreenState extends State<ImplicitAnimationsScreen> {
+class _ImplicitAnimationsExScreenState
+    extends State<ImplicitAnimationsExScreen> {
   bool _visible = true;
 
   void _trigger() {
@@ -26,7 +27,7 @@ class _ImplicitAnimationsScreenState extends State<ImplicitAnimationsScreen> {
     final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Implict Animations'),
+        title: const Text('Implict Animations Ex'),
       ),
       body: Center(
         child: Column(
