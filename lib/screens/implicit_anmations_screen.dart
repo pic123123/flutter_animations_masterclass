@@ -32,6 +32,7 @@ class _ImplicitAnimationsScreenState extends State<ImplicitAnimationsScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             AnimatedContainer(
+              ///https://api.flutter.dev/flutter/animation/Curves-class.html
               curve: Curves.elasticOut,
               duration: const Duration(seconds: 2),
               width: size.width * 0.8,
