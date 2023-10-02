@@ -1,6 +1,7 @@
 //Implicit 직접적으로 표현되지 않고, 반대말은 Explicit 공공연히 보여짐
 //Implicit widget을 사용하면 애니메이션을 만들필요 없다.Trigger될때 나타남
 //widget 이름이 Animated로 시작하면 Implicit widget이다
+
 import 'package:flutter/material.dart';
 
 class ImplicitAnimationsScreen extends StatefulWidget {
@@ -31,18 +32,21 @@ class _ImplicitAnimationsScreenState extends State<ImplicitAnimationsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            AnimatedContainer(
+            TweenAnimationBuilder(
               ///https://api.flutter.dev/flutter/animation/Curves-class.html
-              curve: Curves.elasticOut,
-              duration: const Duration(seconds: 2),
-              width: size.width * 0.8,
-              height: size.width * 0.8,
-              transform: Matrix4.rotationZ(_visible ? 1 : 0),
-              transformAlignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: _visible ? Colors.red : Colors.amber,
-                borderRadius: BorderRadius.circular(_visible ? 100 : 0),
+              curve: Curves.bounceInOut,
+              tween: ColorTween(
+                begin: Colors.yellow,
+                end: Colors.red,
               ),
+              builder: (context, value, child) {
+                return Image.network(
+                  "https://upload.wikimedia.org/wikipedia/commons/4/4f/Dash%2C_the_mascot_of_the_Dart_programming_language.png",
+                  color: value,
+                  colorBlendMode: BlendMode.colorBurn,
+                );
+              },
+              duration: const Duration(seconds: 5),
             ),
             const SizedBox(
               height: 50,
