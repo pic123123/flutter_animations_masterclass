@@ -35,6 +35,9 @@ class _ImplicitAnimationsScreenState extends State<ImplicitAnimationsScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: const Text('Implict Animations Ex'),
+      ),
       body: Center(
         child: GridView.count(
           shrinkWrap: true,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animations_masterclass/screens/explicit_animations_screen.dart';
 
 import 'implicit_animations_screen.dart';
 import 'implicit_animations_screen_ex.dart';
@@ -41,6 +42,15 @@ class MenuScreen extends StatelessWidget {
                 );
               },
               child: const Text('Implicit Animations'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _goToPage(
+                  context,
+                  const ExplicitAnimations(),
+                );
+              },
+              child: const Text('Explicit Animations'),
             ),
           ],
         ),
