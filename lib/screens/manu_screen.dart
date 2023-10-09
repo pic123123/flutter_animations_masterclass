@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animations_masterclass/screens/explicit_animations_screen.dart';
 import 'package:flutter_animations_masterclass/screens/pomodoro_screen.dart';
+import 'package:flutter_animations_masterclass/screens/swiping_cards_screen.dart';
 
 import 'implicit_animations_screen.dart';
 import 'implicit_animations_screen_ex.dart';
@@ -61,6 +62,15 @@ class MenuScreen extends StatelessWidget {
                 );
               },
               child: const Text('Pomodoro'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _goToPage(
+                  context,
+                  const SwipingCardsScreen(),
+                );
+              },
+              child: const Text('Swping Cards'),
             ),
           ],
         ),
