@@ -11,6 +11,9 @@ class SwipingCardsScreen extends StatefulWidget {
 
 class _SwipingCardsScreenState extends State<SwipingCardsScreen>
     with SingleTickerProviderStateMixin {
+  // Add a state variable for the background color
+  Color backgroundColor = Colors.white;
+
   late final size = MediaQuery.of(context).size;
 
   late final AnimationController _position = AnimationController(
@@ -33,6 +36,11 @@ class _SwipingCardsScreenState extends State<SwipingCardsScreen>
 
   void _onHorizontalDragUpdate(DragUpdateDetails details) {
     _position.value += details.delta.dx;
+
+    // Update the background color based on the drag direction
+    setState(() {
+      backgroundColor = details.delta.dx < 0 ? Colors.red : Colors.green;
+    });
   }
 
   void _whenComplete() {
@@ -71,71 +79,176 @@ class _SwipingCardsScreenState extends State<SwipingCardsScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Swiping Cards'),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: backgroundColor,
+        appBar: AppBar(
+          title: const Text('Swiping Cards'),
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: AnimatedBuilder(
+                animation: _position,
+                builder: (context, child) {
+                  final angle = _rotation.transform(
+                          (_position.value + size.width / 2) / size.width) *
+                      pi /
+                      180;
+                  final scale =
+                      _scale.transform(_position.value.abs() / size.width);
+                  return Stack(
+                    alignment: Alignment.topCenter,
+                    children: [
+                      Positioned(
+                        top: 50,
+                        child: Transform.scale(
+                            scale: min(scale, 1.0),
+                            child: Card(index: _index == 5 ? 1 : _index + 1)),
+                      ),
+                      Positioned(
+                          top: 50,
+                          child: GestureDetector(
+                              onHorizontalDragUpdate: _onHorizontalDragUpdate,
+                              onHorizontalDragEnd: _onHorizontalDragEnd,
+                              child: Transform.translate(
+                                  offset: Offset(_position.value, 0),
+                                  child: Transform.rotate(
+                                      angle: angle,
+                                      child: Card(index: _index))))),
+                    ],
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: ProgressBar(
+                currentIndex: _index,
+                totalCards: 5,
+              ),
+            ),
+          ],
+        ),
       ),
-      body: AnimatedBuilder(
-        animation: _position,
+    );
+  }
+}
+
+class Card extends StatefulWidget {
+  final int index;
+
+  const Card({Key? key, required this.index}) : super(key: key);
+
+  @override
+  _CardState createState() => _CardState();
+}
+
+class _CardState extends State<Card> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  bool isFlipped = false;
+
+  // Create a map to store the text for each index
+  final Map<int, String> cardTexts = {
+    1: 'InterStellar',
+    2: 'Pirates of the caribbean',
+    3: 'Blade runner',
+    4: 'Hans Zimmer',
+    5: 'The Dark Knight'
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 1));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
+
+  void flipCard() {
+    setState(() {
+      isFlipped = !isFlipped;
+    });
+    if (_controller.isCompleted) {
+      _controller.reverse();
+    } else {
+      _controller.forward();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final frontSide = Material(
+        elevation: 10,
+        borderRadius: BorderRadius.circular(10),
+        clipBehavior: Clip.hardEdge,
+        child: SizedBox(
+          width: size.width * 0.8,
+          height: size.height * 0.65,
+          child: Image.asset("assets/covers/${widget.index}.jpg",
+              fit: BoxFit.cover),
+        ));
+
+    final backSide = Transform(
+      alignment: Alignment.center,
+      transform: Matrix4.identity()..rotateY(pi),
+      child: Material(
+        elevation: 10,
+        borderRadius: BorderRadius.circular(10),
+        clipBehavior: Clip.hardEdge,
+        child: SizedBox(
+          width: size.width * 0.8,
+          height: size.height * 0.65,
+          child: Center(
+            child: Text(
+              cardTexts[widget.index] ?? '',
+              style: const TextStyle(fontSize: 30, color: Colors.black),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    return GestureDetector(
+      onTap: flipCard,
+      child: AnimatedBuilder(
+        animation: _controller,
         builder: (context, child) {
-          final angle = _rotation.transform(
-                (_position.value + size.width / 2) / size.width,
-              ) *
-              pi /
-              180;
-          final scale = _scale.transform(_position.value.abs() / size.width);
-          return Stack(
-            alignment: Alignment.topCenter,
-            children: [
-              Positioned(
-                top: 100,
-                child: Transform.scale(
-                  scale: min(scale, 1.0),
-                  child: Card(index: _index == 5 ? 1 : _index + 1),
-                ),
-              ),
-              Positioned(
-                top: 100,
-                child: GestureDetector(
-                  onHorizontalDragUpdate: _onHorizontalDragUpdate,
-                  onHorizontalDragEnd: _onHorizontalDragEnd,
-                  child: Transform.translate(
-                    offset: Offset(_position.value, 0),
-                    child: Transform.rotate(
-                      angle: angle,
-                      child: Card(index: _index),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          );
+          return Transform(
+              alignment: Alignment.center,
+              transform: Matrix4.identity()
+                ..setEntry(3, 2, 0.001)
+                ..rotateY(pi * _controller.value),
+              child: _controller.value < 0.5 ? frontSide : backSide);
         },
       ),
     );
   }
 }
 
-class Card extends StatelessWidget {
-  final int index;
+class ProgressBar extends StatelessWidget {
+  final int currentIndex;
+  final int totalCards;
 
-  const Card({super.key, required this.index});
+  const ProgressBar({
+    Key? key,
+    required this.currentIndex,
+    required this.totalCards,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    return Material(
-      elevation: 10,
-      borderRadius: BorderRadius.circular(10),
-      clipBehavior: Clip.hardEdge,
-      child: SizedBox(
-        width: size.width * 0.8,
-        height: size.height * 0.5,
-        child: Image.asset(
-          "assets/covers/$index.jpg",
-          fit: BoxFit.cover,
-        ),
-      ),
+    return LinearProgressIndicator(
+      value: currentIndex / totalCards, // Calculate progress
+      semanticsLabel: 'Card Progress',
+      backgroundColor: Colors.grey[200],
+      valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
     );
   }
 }
