@@ -242,21 +242,24 @@ class _OurLastAnimationScreenState extends State<OurLastAnimationScreen> {
                   SizedBox(height: (MediaQuery.of(context).size.height) * 0.5),
 
                   AnimatedSwitcher(
-                    // Add AnimatedSwitcher
                     duration: const Duration(seconds: 1),
                     child: _showCards
                         ? SizedBox(
-                            // Only show the cards when _showCards is true
                             height: MediaQuery.of(context).size.height * .6,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
+                            child: PageView.builder(
+                              controller: PageController(initialPage: _index),
                               itemCount: items.length,
                               itemBuilder: (context, index) {
                                 return buildCard(items[index], index);
                               },
+                              onPageChanged: (index) {
+                                setState(() {
+                                  _index = index;
+                                });
+                              },
                             ),
                           )
-                        : Container(), // Show an empty container when _showCards is false
+                        : Container(),
                   ),
                   SizedBox(height: (MediaQuery.of(context).size.height) * 0.5),
                 ],
